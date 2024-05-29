@@ -40,3 +40,14 @@ def build_prompt_elicitation(stakeholder_data):
     """
 
     return prompt
+
+# app/utils/prompt_builder.py
+
+def build_prompt_minutes(transcribed_text):
+    prompt = f"""
+    Basado en la siguiente transcripción de una reunión, redacta un acta de reunión completa e identifica posibles requisitos mencionados durante la reunión. El acta debe incluir: Objetivo, Participantes, Desarrollo de la Reunión, Temas Discutidos, Decisiones Tomadas, Compromisos, y Requisitos Identificados.
+
+    Transcripción de la reunión:
+    {transcribed_text}
+    """
+    return prompt

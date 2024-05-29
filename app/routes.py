@@ -1,8 +1,10 @@
 from flask import Blueprint, request, jsonify
-
 from .service.ia_service import get_ai_response
 from .service.srs_service import generate_srs_document
 from .service.elicitation_service import get_elicitation_response
+from .service.acta_reunion_service import generate_acta_reunion
+import os
+import tempfile
 
 main_bp = Blueprint('main', __name__)
 
@@ -35,3 +37,27 @@ def get_elicitations():
 
     response = get_elicitation_response(stakeholder_data)
     return jsonify({"response": response})
+
+@main_bp.route('/generate_reunion', methods=['POST'])
+def generate_minutes():
+    if 'audio' not in request.files:
+        return jsonify({"error": "No audio file provided"}), 400
+
+    audio_file = request.files['audio']
+    if audio_file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    # Crear un archivo temporal para guardar el audio
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as tmp:
+        file_path = tmp.name
+        audio_file.save(file_path)
+
+    minutes_document = generate_acta_reunion(file_path)
+    
+    # Eliminar el archivo temporal después de su uso
+    os.remove(file_path)
+    
+    if not minutes_document:
+        return jsonify({"error": "Failed to transcribe audio or generate minutes"}), 500
+
+    return jsonify({"acta_reunion": minutes_document})
