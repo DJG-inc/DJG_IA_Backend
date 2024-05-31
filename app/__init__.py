@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from .config import Config
 
 def create_app():
@@ -7,6 +8,7 @@ def create_app():
 
     with app.app_context():
         # Importa las rutas
+        CORS(app, origins="*")
         from .routes import main_bp
         app.register_blueprint(main_bp)
 
